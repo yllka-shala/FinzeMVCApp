@@ -1,0 +1,70 @@
+﻿@using FinanceApp.Models
+@model User
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title pt-2 pb-0">Edit User</h5>
+                </div>
+                <div class="card-body pt-3">
+                    <form asp-action="Edit" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <input type="hidden" asp-for="Id" />
+                        <div class="row mb-3">
+                            <label asp-for="FirstName" class="col-sm-3 col-form-label">FirstName</label>
+                            <div class="col-sm-9">
+                                <input type="text" asp-for="FirstName" class="form-control">
+                                <span asp-validation-for="FirstName" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <label asp-for="LastName" class="col-sm-3 col-form-label">LastName</label>
+                            <div class="col-sm-9">
+                                <input type="text" asp-for="LastName" class="form-control">
+                                <span asp-validation-for="LastName" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <label asp-for="Email" class="col-sm-3 col-form-label">Email</label>
+                            <div class="col-sm-9">
+                                <input type="text" asp-for="Email" class="form-control">
+                                <span asp-validation-for="Email" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <label asp-for="RoleId" class="col-sm-3 col-form-label">Role</label>
+                            <div class="col-sm-9">
+                                <select name="RoleId" asp-for="RoleId" class="form-select" asp-items="@(new SelectList(ViewBag.Role, "Id", "Name"))">
+                                    <option value="">Select</option>
+                                </select>
+                                <span asp-validation-for="RoleId" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <label asp-for="IsActive" class="col-sm-3 form-check-label">IsActive</label>
+                            <div class="col-sm-9">
+                                <div class="form-check">
+                                    <input asp-for="IsActive" class="form-check-input" type="checkbox">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-9">
+                                <button type="submit" class="btn btn-outline-success">Save</button>
+                                <a class="btn btn-outline-secondary" asp-action="Index">Back</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -1,0 +1,123 @@
+﻿using AspNetCoreGeneratedDocument;
+using FinanceApp.DTOs;
+using FinanceApp.Enums;
+using FinanceApp.Helpers;
+using FinanceApp.Models;
+using FinanceApp.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using System.Security.Claims;
+
+namespace FinanceApp.Controllers
+{
+    [Authorize]
+    public class BudgetController : Controller
+    {
+        private readonly IBudgetService _service;
+        private readonly ICategoryService _categoryService;
+
+        public BudgetController(IBudgetService service, ICategoryService categoryService)
+        {
+            _service = service;
+            _categoryService = categoryService;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Index(string search, int? pageNumber)
+        {
+            ViewData["CurrentFilter"] = search;
+
+            int pageSize = 10;
+            var result = await _service.GetAll(search, pageNumber ?? 1, pageSize);
+
+            return View(result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Create()
+        {
+            var category = await _categoryService.GetCategories();
+            ViewBag.Category = category;
+
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Create(BudgetDTO budget)
+        {
+            if (ModelState.IsValid)
+            {
+                var result = await _service.Create(budget);
+                if (result == null)
+                {
+                    TempData["error"] = "Error Occurred!";
+                    return RedirectToAction("Index");
+                }
+
+                TempData["success"] = "Data saved successfully!";
+                return RedirectToAction("Index");
+            }
+
+            TempData["error"] = "Error Occurred!";
+            return View(budget);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Edit(int? id, string? search)
+        {
+            if (id == null)
+                return NotFound();
+
+            var budget = await _service.GetById(id);
+            if (budget == null)
+                return NotFound();
+
+            var category = await _categoryService.GetCategories();
+            ViewBag.Category = category;
+
+            return View(budget);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Edit(BudgetDTO budget, int? id)
+        {
+            if (id == null)
+                return NotFound();
+
+            if (ModelState.IsValid)
+            {
+                var result = await _service.Update(budget, id);
+                if (result == null)
+                {
+                    TempData["error"] = "Error Occurred!";
+                    return RedirectToAction("Index");
+                }
+
+                TempData["success"] = "Data updated successfully!";
+                return RedirectToAction("Index");
+            }
+
+            TempData["error"] = "Error Occurred!";
+            return View(budget);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null)
+                return NotFound();
+          
+            var result = await _service.Delete(id);
+            if (result == null)
+            {
+                TempData["error"] = "Error Occurred!";
+                return RedirectToAction("Index");
+            }
+
+            TempData["success"] = "Data deleted successfully!";
+            return RedirectToAction("Index");
+           
+        }
+    }
+}

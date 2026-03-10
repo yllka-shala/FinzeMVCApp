@@ -1,0 +1,72 @@
+﻿@using FinanceApp.DTOs
+@model UserProfileDTO
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title pt-2 pb-0">Profile</h5>
+                </div>
+                <div class="card-body pt-3">
+                    <form asp-action="Profile" asp-controller="User" method="post" enctype="multipart/form-data">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <input type="hidden" asp-for="Id" />
+                        <div class="row mb-3">
+                            <label asp-for="ProfilePicture" class="col-md-4 col-lg-3 col-form-label">Profile Image</label>
+                            <div class="col-md-8 col-lg-9">
+                                <div>
+                                    @if (!string.IsNullOrEmpty(Model.ProfilePicture))
+                                    {
+                                        <img src="@Url.Content("~/Images/" + Model.ProfilePicture)" alt="Profile" width="70" height="70">
+                                    }
+                                    else
+                                    {
+                                        <img src="~/Theme/assets/img/profile.png" alt="Profile" width="70" height="70">   
+                                    }                      
+                                </div>
+                                <div class="pt-2">
+                                    <input type="file" asp-for="ImageFile" class="btn btn-light col-11" />
+                                    <a asp-action="RemoveProfilePicture" class="btn btn-danger btn-sm" title="Remove profile image"><i class="bi bi-trash"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <label asp-for="FirstName" class="col-sm-3 col-form-label">FirstName</label>
+                            <div class="col-sm-9">
+                                <input type="text" asp-for="FirstName" class="form-control">
+                                <span asp-validation-for="FirstName" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <label asp-for="LastName" class="col-sm-3 col-form-label">LastName</label>
+                            <div class="col-sm-9">
+                                <input type="text" asp-for="LastName" class="form-control">
+                                <span asp-validation-for="LastName" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <label asp-for="Email" class="col-sm-3 col-form-label">Email</label>
+                            <div class="col-sm-9">
+                                <input type="text" asp-for="Email" class="form-control">
+                                <span asp-validation-for="Email" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-9">
+                                <button type="submit" class="btn btn-outline-success">Save</button>
+                                <a class="btn btn-outline-secondary" asp-action="AccountSettings">Back</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

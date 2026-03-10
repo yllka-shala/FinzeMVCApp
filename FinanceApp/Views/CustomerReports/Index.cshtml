@@ -1,0 +1,170 @@
+﻿@using System.Text.Json
+@using FinanceApp.DTOs
+@model CustomerReportDTO
+
+<div class="container">
+    <div class="row">
+        <div class="col pt-2">
+            <div class="row">
+                <div class="col-xxl-3 col-md-6">
+                    <div class="card info-card revenue-card">
+
+                        <div class="card-body">
+                            <h5 class="card-title">Transactions <span>| This Month</span></h5>
+
+                            <div class="d-flex align-items-center">
+                                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                    <i class="bi bi-currency-dollar"></i>
+                                </div>
+                                <div class="ps-3">
+                                    <h6>@Model.TotalTransactionsThisMonth</h6>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="col-xxl-3 col-md-6">
+
+                    <div class="card info-card customers-card">
+                        <div class="card-body">
+                            <h5 class="card-title">Budget <span>| This Year</span></h5>
+
+                            <div class="d-flex align-items-center">
+                                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                    <i class="bi bi-cash-coin"></i>
+                                </div>
+                                <div class="ps-3">
+                                    <h6>@Model.TotalBudgetPerYear</h6>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+                <div class="col-xxl-3 col-md-6">
+                    <div class="card info-card sales-card">
+                        <div class="card-body">
+                            <h5 class="card-title">Accounts <span>| Total</span></h5>
+
+                            <div class="d-flex align-items-center">
+                                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                    <i class="bi bi-people"></i>
+                                </div>
+                                <div class="ps-3">
+                                    <h6>@Model.CountFinancialAccounts</h6>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="col-xxl-3 col-md-6">
+
+                    <div class="card info-card users-card">
+                        <div class="card-body">
+                            <h5 class="card-title">Categories <span>| Total</span></h5>
+
+                            <div class="d-flex align-items-center">
+                                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                    <i class="bi bi-stack"></i>
+                                </div>
+                                <div class="ps-3">
+                                    <h6>@Model.CountCategories</h6>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-12">
+            <div class="row">
+                <div class="col-lg-6 col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <canvas style=" max-height:350px;" id="getTransactionsLast7Days"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <canvas style="max-height: 350px;" id="getTransactionsLast7Months"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="col-lg-12">
+            <div class="row">
+                <div class="col-lg-4 col-md-6">
+                    <div class="card">
+                        <div class="card-body pt-3">
+                            <h6 class="card-title pt-2 pb-0">Transactions based on Category</h6>
+                            <canvas style="max-width: 400px; max-height:350px;" id="GetTransactionsByCategoryChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="card">
+                        <div class="card-body pt-3">
+                            <h6 class="card-title pt-2 pb-0">Monthly Transactions</h6>
+                            <canvas style="max-width: 400px; max-height:350px;" id="GetMonthlySpentData"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="card">
+                        <div class="card-body pt-3">
+                            <h6 class="card-title pt-2 pb-0">Budget allocated per Category</h6>
+                            <canvas style="max-width: 400px; max-height:350px;" id="GetBudgetsByCategoryData"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        var transactionsByCategory = @Html.Raw(JsonSerializer.Serialize(Model.GetTransactionsByCategoryChart));
+        const labelTBC = transactionsByCategory.map(d =>d.Category);
+        const dataTBC = transactionsByCategory.map(d =>d.Total);
+
+        renderMyChart('GetTransactionsByCategoryChart', dataTBC, labelTBC, 'pie', 'Transaction by Category');
+    </script>
+    <script>
+        var monthlySpentData = @Html.Raw(JsonSerializer.Serialize(Model.GetMonthlySpentData));
+        const labelMSD = monthlySpentData.map(d => d.Label);
+        const dataMSD = monthlySpentData.map(d => d.Total);
+
+        renderMyChart('GetMonthlySpentData', dataMSD, labelMSD, 'doughnut', 'Monthly Spending');
+    </script>
+    <script>
+        var budgetByCategory = @Html.Raw(JsonSerializer.Serialize(Model.GetBudgetsByCategoryData));
+        const labelBBC = budgetByCategory.map(d => d.Category);
+        const dataBBC = budgetByCategory.map(d => d.Total);
+
+        renderMyChart('GetBudgetsByCategoryData', dataBBC, labelBBC, 'doughnut', 'Budget allocated per Category');
+    </script>
+<script>
+    var transactionsLast7Days = @Html.Raw(JsonSerializer.Serialize(Model.GetTransactionsLast7Days));
+    const labelsTLD = transactionsLast7Days.map(d => new Date(d.Date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+    const dataTLD = transactionsLast7Days.map(d => d.TotalAmount);
+
+    renderMyChart('getTransactionsLast7Days', dataTLD, labelsTLD, 'bar', 'Transactions Amount (Last 7 Days)');
+</script>
+<script>
+    var transactionsLAst7Months = @Html.Raw(JsonSerializer.Serialize(Model.GetTransactionsLast7Months));
+    const labelsTLM = transactionsLAst7Months.map(d => new Date(d.Date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+    const dataTLM = transactionsLAst7Months.map(d => d.TotalAmount);
+
+    renderMyChart('getTransactionsLast7Months', dataTLM, labelsTLM, 'line', 'Transactions Amount (Last 7 Months)');
+</script>
+}

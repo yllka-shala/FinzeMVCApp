@@ -1,0 +1,138 @@
+﻿@using System.Text.Json
+@using System.Security.Claims
+@using FinanceApp.DTOs
+@model AdminReportDTO
+@{
+    ViewData["Title"] = "Home Page";
+    bool isAdmin = User?.IsInRole("Admin") ?? false;
+}
+@if (isAdmin)
+{
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 pt-2">
+                <div class="row">
+
+                    <div class="col-xxl-3 col-md-6">
+
+                        <div class="card info-card customers-card">
+                            <div class="card-body">
+                                <h5 class="card-title">Customers <span>| This Year</span></h5>
+
+                                <div class="d-flex align-items-center">
+                                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                        <i class="bi bi-people"></i>
+                                    </div>
+                                    <div class="ps-3">
+                                        <h6>@Model.Customers</h6>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="col-xxl-3 col-md-6">
+                        <div class="card info-card revenue-card">
+
+                            <div class="card-body">
+                                <h5 class="card-title">Transactions <span>| This Month</span></h5>
+
+                                <div class="d-flex align-items-center">
+                                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                        <i class="bi bi-currency-dollar"></i>
+                                    </div>
+                                    <div class="ps-3">
+                                        <h6>@Model.TransactionsPerMonth</h6>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="col-xxl-3 col-md-6">
+
+                        <div class="card info-card users-card">
+                            <div class="card-body">
+                                <h5 class="card-title">Users <span>| Total</span></h5>
+
+                                <div class="d-flex align-items-center">
+                                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                        <i class="bi bi-people-fill"></i>
+                                    </div>
+                                    <div class="ps-3">
+                                        <h6>@Model.Users</h6>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="col-xxl-3 col-md-6">
+                        <div class="card info-card sales-card">
+                            <div class="card-body">
+                                <h5 class="card-title">InActive Users <span>| Total</span></h5>
+
+                                <div class="d-flex align-items-center">
+                                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                        <i class="bi bi-person-dash"></i>
+                                    </div>
+                                    <div class="ps-3">
+                                        <h6>@Model.InActiveUsers</h6>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12">
+                <div class="row">
+                    <div class="col-lg-6 col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <canvas style=" max-height:350px;" id="transactionAmountLast7Days"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <canvas style="max-height: 350px;" id="transactionAountLast7Months"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+               
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="text-center pt-4">
+        <h1 class="display-4">Welcome</h1>
+    </div>
+}
+
+@section Scripts{
+    <script>
+        var transactionAmountLast7Days = @Html.Raw(JsonSerializer.Serialize(Model.DailyTransactions));
+        const labelsTLD = transactionAmountLast7Days.map(d => new Date(d.Date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+        const dataTLD = transactionAmountLast7Days.map(d => d.TotalAmount);
+
+        renderMyChart('transactionAmountLast7Days', dataTLD, labelsTLD, 'bar', 'Transactions Amount (Last 7 Days)');
+    </script>
+    <script>
+         var transactionAountLast7Months = @Html.Raw(JsonSerializer.Serialize(Model.MonthlyTransactions));
+         const labelsTLM = transactionAountLast7Months.map(d => new Date(d.Date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+         const dataTLM = transactionAountLast7Months.map(d => d.TotalAmount);
+
+        renderMyChart('transactionAountLast7Months', dataTLM, labelsTLM, 'line', 'Transactions Amount (Last 7 Months)');
+    </script>
+}

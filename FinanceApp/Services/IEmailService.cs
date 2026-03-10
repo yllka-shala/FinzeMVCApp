@@ -1,0 +1,7 @@
+﻿namespace FinanceApp.Services
+{
+    public interface IEmailService
+    {
+        Task SendEmailAsync(string to, string subject, string html, string from = null);
+    }
+}
