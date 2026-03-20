@@ -11,5 +11,6 @@ namespace FinanceApp.Services
         Task<BillReminder> Create(BillReminderDTO create);
         Task<BillReminder> Update(BillReminderDTO update, int? id);
         Task<BillReminder> Delete(int? id);
+        Task<byte[]> ExportExcel();
     }
 }

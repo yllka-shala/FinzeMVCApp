@@ -11,5 +11,6 @@ namespace FinanceApp.Services
         Task<Goal> Create(GoalDTO create);
         Task<Goal> Update(GoalDTO update, int? id);
         Task<Goal> Delete(int? id);
+        Task<byte[]> ExportExcel();
     }
 }

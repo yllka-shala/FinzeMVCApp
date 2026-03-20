@@ -112,5 +112,15 @@ namespace FinanceApp.Controllers
             return RedirectToAction("Index");
 
         }
+
+        [HttpPost]
+        public async Task<IActionResult> ExportExcel()
+        {
+            var content = await _service.ExportExcel();
+            var contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+            var fileName = $"FinancialAccountReport_{DateTime.Now:dd-MM-yyyy}.xlsx";
+
+            return File(content, contentType, fileName);
+        }
     }
 }

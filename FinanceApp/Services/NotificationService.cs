@@ -1,4 +1,5 @@
-﻿using FinanceApp.Data;
+﻿using ClosedXML.Excel;
+using FinanceApp.Data;
 using FinanceApp.DTOs;
 using FinanceApp.Enums;
 using FinanceApp.Helpers;
@@ -158,6 +159,41 @@ namespace FinanceApp.Services
             await _context.SaveChangesAsync();
 
             return notifications;
+        }
+
+        public async Task<byte[]> ExportExcel()
+        {
+            var notifications = await _context.Notifications
+                                             .Include(nt => nt.NotificationType)
+                                             .Include(u => u.User)
+                                             .ToListAsync();
+
+            if (!_currentUser.IsAdmin())
+            {
+                var userId = _currentUser.LoggedInUser();
+                notifications = notifications.Where(t => t.UserId == userId).ToList();
+            }
+
+            var exportData = notifications.Select(u => new
+            {
+                Id = u.Id,
+                NotificationType = u.NotificationType!.Name,
+                Message = u.Message,
+                Read = u.Read,
+                CreatedDate = u.CreatedDate.ToString("dd-MM-yyyy"),
+                User = $"{u.User!.FirstName} {u.User.LastName}"
+            }).ToList();
+
+            using var workbook = new XLWorkbook();
+            var worksheet = workbook.Worksheets.Add("Notifications");
+
+            worksheet.Cell("A1").InsertTable(exportData);
+
+            worksheet.Columns().AdjustToContents();
+
+            using var stream = new MemoryStream();
+            workbook.SaveAs(stream);
+            return stream.ToArray();
         }
 
     }

@@ -136,9 +136,9 @@ namespace FinanceApp.Services
             {
                 Id = u.Id,      
                 Category = u.Category!.Name,
-                Limit = u.Limit,
-                CurrentSpent = u.CurrentSpent,
-                Remaining = u.Remaining,
+                Limit = $"{u.Limit}$",
+                CurrentSpent = $"{u.CurrentSpent}$",
+                Remaining = $"{u.Remaining}$",
                 CreatedDate = u.CreatedDate.ToString("dd-MM-yyyy"),
                 User = $"{u.User!.FirstName} {u.User.LastName}"
             }).ToList();

@@ -1,4 +1,5 @@
-﻿using FinanceApp.Data;
+﻿using ClosedXML.Excel;
+using FinanceApp.Data;
 using FinanceApp.DTOs;
 using FinanceApp.Enums;
 using FinanceApp.Helpers;
@@ -133,6 +134,42 @@ namespace FinanceApp.Services
             await _context.Notifications.AddAsync(notification);
 
             return notification;
+        }
+
+        public async Task<byte[]> ExportExcel()
+        {
+            var goals = await _context.Goals
+                                    .Include(u => u.User)
+                                    .ToListAsync();
+
+            if (!_currentUser.IsAdmin())
+            {
+                var userId = _currentUser.LoggedInUser();
+                goals = goals.Where(t => t.UserId == userId).ToList();
+            }
+
+            var exportData = goals.Select(u => new
+            {
+                Id = u.Id,
+                Name = u.Name,
+                TargetAmount = $"{u.TargetAmount}$",
+                CurrentAmount = $"{u.CurrentAmount}$",
+                Progress = $"{u.Progress.ToString("F2")}%",
+                DueDate = u.DueDate.ToString("dd-MM-yyyy"),
+                CreatedDate = u.CreatedDate.ToString("dd-MM-yyyy"),
+                User = $"{u.User!.FirstName} {u.User.LastName}"
+            }).ToList();
+
+            using var workbook = new XLWorkbook();
+            var worksheet = workbook.Worksheets.Add("Goals");
+
+            worksheet.Cell("A1").InsertTable(exportData);
+
+            worksheet.Columns().AdjustToContents();
+
+            using var stream = new MemoryStream();
+            workbook.SaveAs(stream);
+            return stream.ToArray();
         }
     }
 }

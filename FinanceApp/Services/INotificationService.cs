@@ -14,5 +14,6 @@ namespace FinanceApp.Services
         Task<Notification> Delete(int? id);
         Task<List<NotificationType>> GetNotificationTypeList();
         Task<List<Notification>> ClearAll();
+        Task<byte[]> ExportExcel();
     }
 }

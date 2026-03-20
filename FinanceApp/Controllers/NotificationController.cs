@@ -123,5 +123,15 @@ namespace FinanceApp.Controllers
             var result = await _service.ClearAll();
             return RedirectToAction("Index", "Home");
         }
+
+        [HttpPost]
+        public async Task<IActionResult> ExportExcel()
+        {
+            var content = await _service.ExportExcel();
+            var contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+            var fileName = $"NotificationReport_{DateTime.Now:dd-MM-yyyy}.xlsx";
+
+            return File(content, contentType, fileName);
+        }
     }
 }

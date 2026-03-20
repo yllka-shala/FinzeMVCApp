@@ -1,12 +1,13 @@
-﻿using FinanceApp.Data;
+﻿using ClosedXML.Excel;
+using FinanceApp.Data;
 using FinanceApp.DTOs;
 using FinanceApp.Helpers;
 using FinanceApp.Models;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
 using Org.BouncyCastle.Crypto.Generators;
 using System.Security.Claims;
-using Microsoft.AspNetCore.Authentication;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace FinanceApp.Services
@@ -157,6 +158,34 @@ namespace FinanceApp.Services
             await _context.SaveChangesAsync();
 
             return existingUser;
+        }
+
+        public async Task<byte[]> ExportExcel()
+        {
+            var users = await _context.Users
+                                    .Include(u => u.Role)
+                                    .ToListAsync();
+
+            var exportData = users.Select(u => new
+            {
+                Id = u.Id,
+                User = $"{u.FirstName} {u.LastName}",
+                Email = u.Email,
+                Role = u.Role!.Name,
+                IsActive = u.IsActive,
+                CreatedDate = u.CreatedDate.ToString("dd-MM-yyyy")                
+            }).ToList();
+
+            using var workbook = new XLWorkbook();
+            var worksheet = workbook.Worksheets.Add("Users");
+
+            worksheet.Cell("A1").InsertTable(exportData);
+
+            worksheet.Columns().AdjustToContents();
+
+            using var stream = new MemoryStream();
+            workbook.SaveAs(stream);
+            return stream.ToArray();
         }
     }
 }

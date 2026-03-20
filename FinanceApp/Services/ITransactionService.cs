@@ -12,5 +12,6 @@ namespace FinanceApp.Services
         Task<Transaction> Update(TransactionDTO update, int? id);
         Task<Transaction> Delete(int? id);
         Task<List<PaymentMethod>> GetAllPaymentMethods();
+        Task<byte[]> ExportExcel();
     }
 }

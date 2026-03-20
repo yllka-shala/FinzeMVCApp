@@ -12,5 +12,6 @@ namespace FinanceApp.Services
         Task<FinancialAccount> Update(FinancialAccountDTO update, int? id);
         Task<FinancialAccount> Delete(int? id);
         Task<List<AccountType>> GetAccountTypeList();
+        Task<byte[]> ExportExcel();
     }
 }

@@ -12,5 +12,6 @@ namespace FinanceApp.Services
         Task<Recurring> Update(RecurringDTO update, int? id);
         Task<Recurring> Delete(int? id);
         Task<List<Frequency>> GetFrequenciesList();
+        Task<byte[]> ExportExcel();
     }
 }

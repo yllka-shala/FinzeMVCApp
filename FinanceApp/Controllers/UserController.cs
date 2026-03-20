@@ -195,5 +195,14 @@ namespace FinanceApp.Controllers
             return View(model);
         }
 
+        [HttpPost]
+        public async Task<IActionResult> ExportExcel()
+        {
+            var content = await _service.ExportExcel();
+            var contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+            var fileName = $"UserReport_{DateTime.Now:dd-MM-yyyy}.xlsx";
+
+            return File(content, contentType, fileName);
+        }
     }
 }
