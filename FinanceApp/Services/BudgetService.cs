@@ -1,9 +1,11 @@
 ﻿using AspNetCoreGeneratedDocument;
+using ClosedXML.Excel;
 using FinanceApp.Data;
 using FinanceApp.DTOs;
 using FinanceApp.Enums;
 using FinanceApp.Helpers;
 using FinanceApp.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
@@ -52,7 +54,7 @@ namespace FinanceApp.Services
             var budget = await _context.Budgets
                                        .Include(c => c.Category)
                                        .Include(u => u.User).FirstOrDefaultAsync(b => b.Id == id);
-           
+
             if (budget == null)
                 return null;
 
@@ -61,9 +63,9 @@ namespace FinanceApp.Services
 
         public async Task<Budget> Create(BudgetDTO model)
         {
-            var exists = _context.Budgets.Any(b => b.CategoryId == model.CategoryId && 
+            var exists = _context.Budgets.Any(b => b.CategoryId == model.CategoryId &&
                                                    b.UserId == _currentUser.LoggedInUser());
-            
+
             if (exists)
                 return null;
 
@@ -88,9 +90,9 @@ namespace FinanceApp.Services
             if (existingBudget == null)
                 return null;
 
-            var exists = _context.Budgets.Any(b => b.CategoryId == update.CategoryId && 
+            var exists = _context.Budgets.Any(b => b.CategoryId == update.CategoryId &&
                                                    b.Id != id && b.UserId == _currentUser.LoggedInUser());
-            
+
             if (exists)
                 return null;
 
@@ -115,6 +117,42 @@ namespace FinanceApp.Services
             await _context.SaveChangesAsync();
 
             return budget;
+        }
+
+        public async Task<byte[]> ExportExcel()
+        {
+            var budgets = await _context.Budgets
+                                        .Include(c => c.Category)
+                                        .Include(u => u.User)
+                                        .ToListAsync();
+
+            if (!_currentUser.IsAdmin())
+            {
+                var userId = _currentUser.LoggedInUser();
+                budgets = budgets.Where(t => t.UserId == userId).ToList();
+            }
+
+            var exportData = budgets.Select(u => new
+            {
+                Id = u.Id,      
+                Category = u.Category!.Name,
+                Limit = u.Limit,
+                CurrentSpent = u.CurrentSpent,
+                Remaining = u.Remaining,
+                CreatedDate = u.CreatedDate.ToString("dd-MM-yyyy"),
+                User = $"{u.User!.FirstName} {u.User.LastName}"
+            }).ToList();
+
+            using var workbook = new XLWorkbook();
+            var worksheet = workbook.Worksheets.Add("Budgets");
+
+            worksheet.Cell("A1").InsertTable(exportData);
+
+            worksheet.Columns().AdjustToContents();
+
+            using var stream = new MemoryStream();
+            workbook.SaveAs(stream);
+            return stream.ToArray();
         }
     }
 }
