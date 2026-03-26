@@ -13,5 +13,6 @@ namespace FinanceApp.Services
         Task<FinancialAccount> Delete(int? id);
         Task<List<AccountType>> GetAccountTypeList();
         Task<byte[]> ExportExcel();
+        Task<byte[]> ExportPdf();
     }
 }

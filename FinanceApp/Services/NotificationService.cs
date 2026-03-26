@@ -5,6 +5,9 @@ using FinanceApp.Enums;
 using FinanceApp.Helpers;
 using FinanceApp.Models;
 using Microsoft.EntityFrameworkCore;
+using QuestPDF.Fluent;
+using QuestPDF.Helpers;
+using QuestPDF.Infrastructure;
 using System.Security.Claims;
 
 namespace FinanceApp.Services
@@ -163,26 +166,7 @@ namespace FinanceApp.Services
 
         public async Task<byte[]> ExportExcel()
         {
-            var notifications = await _context.Notifications
-                                             .Include(nt => nt.NotificationType)
-                                             .Include(u => u.User)
-                                             .ToListAsync();
-
-            if (!_currentUser.IsAdmin())
-            {
-                var userId = _currentUser.LoggedInUser();
-                notifications = notifications.Where(t => t.UserId == userId).ToList();
-            }
-
-            var exportData = notifications.Select(u => new
-            {
-                Id = u.Id,
-                NotificationType = u.NotificationType!.Name,
-                Message = u.Message,
-                Read = u.Read,
-                CreatedDate = u.CreatedDate.ToString("dd-MM-yyyy"),
-                User = $"{u.User!.FirstName} {u.User.LastName}"
-            }).ToList();
+            var exportData = await GetNotificationExportData();
 
             using var workbook = new XLWorkbook();
             var worksheet = workbook.Worksheets.Add("Notifications");
@@ -194,6 +178,98 @@ namespace FinanceApp.Services
             using var stream = new MemoryStream();
             workbook.SaveAs(stream);
             return stream.ToArray();
+        }
+
+        public async Task<byte[]> ExportPdf()
+        {
+            var exportData = await GetNotificationExportData();
+
+            QuestPDF.Settings.License = LicenseType.Community;
+
+            // Create the document
+            var document = Document.Create(container =>
+            {
+                container.Page(page =>
+                {
+                    page.Size(PageSizes.A4);
+                    page.Margin(1, Unit.Centimetre);
+                    page.PageColor(Colors.White);
+                    page.DefaultTextStyle(x => x.FontSize(12));
+
+                    page.Header().Text("Notification Report").FontSize(20).SemiBold().FontColor(Colors.Blue.Medium);
+
+                    page.Content().PaddingVertical(30).Table(table =>
+                    {
+                        // Define columns
+                        table.ColumnsDefinition(columns =>
+                        {
+                            columns.ConstantColumn(50);
+                            columns.RelativeColumn();
+                            columns.RelativeColumn();
+                            columns.RelativeColumn();
+                            columns.RelativeColumn();
+                            columns.RelativeColumn();
+                        });
+
+                        // Add Header
+                        table.Header(header =>
+                        {
+                            header.Cell().BorderBottom(2).Padding(3).Text("Id").Bold();
+                            header.Cell().BorderBottom(2).Padding(3).Text("NotificationType").Bold();
+                            header.Cell().BorderBottom(2).Padding(3).Text("Message").Bold();
+                            header.Cell().BorderBottom(2).Padding(3).Text("Read").Bold();
+                            header.Cell().BorderBottom(2).Padding(3).Text("CreatedDate").Bold();
+                            header.Cell().BorderBottom(2).Padding(3).Text("User").Bold();
+                        });
+
+                        // Add Data Rows
+                        foreach (var item in exportData)
+                        {
+                            table.Cell().Padding(3).Text(item.Id.ToString());
+                            table.Cell().Padding(3).Text(item.NotificationType);
+                            table.Cell().Padding(3).Text(item.Message);
+                            table.Cell().Padding(3).Text(item.Read);
+                            table.Cell().Padding(3).Text(item.CreatedDate);
+                            table.Cell().Padding(3).Text(item.User);
+                        }
+                    });
+
+                    page.Footer().AlignCenter().Text(x =>
+                    {
+                        x.Span("Page ");
+                        x.CurrentPageNumber();
+                    });
+                });
+            });
+
+            return document.GeneratePdf();
+        }
+
+        private async Task<List<ExportNotificationDataDTO>> GetNotificationExportData()
+        {
+            var query = _context.Notifications
+                                .Include(nt => nt.NotificationType)
+                                .Include(u => u.User)
+                                .AsQueryable();
+
+
+            if (!_currentUser.IsAdmin())
+            {
+                var userId = _currentUser.LoggedInUser();
+                query = query.Where(t => t.UserId == userId);
+            }
+
+            var notifications = await query.ToListAsync();
+
+            return notifications.Select(u => new ExportNotificationDataDTO
+            {
+                Id = u.Id,
+                NotificationType = u.NotificationType!.Name,
+                Message = u.Message,
+                Read = u.Read.ToString(),
+                CreatedDate = u.CreatedDate.ToString("dd-MM-yyyy"),
+                User = $"{u.User!.FirstName} {u.User.LastName}"
+            }).ToList();
         }
 
     }

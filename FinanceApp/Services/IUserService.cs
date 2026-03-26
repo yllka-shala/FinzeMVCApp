@@ -16,5 +16,6 @@ namespace FinanceApp.Services
         Task<User> UpdateProfile(UserProfileDTO profile, int? id);
         Task<User> DeleteProfilePicture(int id);
         Task<byte[]> ExportExcel();
+        Task<byte[]> ExportPdf();
     }
 }

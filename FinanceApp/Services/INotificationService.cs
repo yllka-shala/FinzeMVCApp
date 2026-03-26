@@ -15,5 +15,6 @@ namespace FinanceApp.Services
         Task<List<NotificationType>> GetNotificationTypeList();
         Task<List<Notification>> ClearAll();
         Task<byte[]> ExportExcel();
+        Task<byte[]> ExportPdf();
     }
 }

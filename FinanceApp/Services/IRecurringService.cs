@@ -13,5 +13,6 @@ namespace FinanceApp.Services
         Task<Recurring> Delete(int? id);
         Task<List<Frequency>> GetFrequenciesList();
         Task<byte[]> ExportExcel();
+        Task<byte[]> ExportPdf();
     }
 }

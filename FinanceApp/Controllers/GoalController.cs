@@ -107,14 +107,32 @@ namespace FinanceApp.Controllers
 
         }
 
-        [HttpPost]
-        public async Task<IActionResult> ExportExcel()
-        {
-            var content = await _service.ExportExcel();
-            var contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-            var fileName = $"GoalReport_{DateTime.Now:dd-MM-yyyy}.xlsx";
 
-            return File(content, contentType, fileName);
+        [HttpPost]
+        public async Task<IActionResult> ExportData(string format)
+        {
+            if (string.IsNullOrEmpty(format))
+            {
+                TempData["error"] = "Invalid format!";
+                return RedirectToAction("Index");
+            }
+
+            if (format.ToLower() == "excel")
+            {
+                var content = await _service.ExportExcel();
+                var contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+                var fileName = $"GoalReport_{DateTime.Now:dd-MM-yyyy}.xlsx";
+
+                return File(content, contentType, fileName);
+            }
+            else
+            {
+                var content = await _service.ExportPdf();
+                var contentType = "application/pdf";
+                var fileName = $"GoalReport_{DateTime.Now:dd-MM-yyyy}.pdf";
+
+                return File(content, contentType, fileName);
+            }
         }
     }
 }

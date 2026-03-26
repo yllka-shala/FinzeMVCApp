@@ -13,5 +13,6 @@ namespace FinanceApp.Services
         Task<Category> Update(CategoryDTO category, int? id);
         Task<Category> Delete(int? id);
         Task<byte[]> ExportExcel();
+        Task<byte[]> ExportPdf();
     }
 }

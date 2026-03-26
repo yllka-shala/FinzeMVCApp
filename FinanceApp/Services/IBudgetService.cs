@@ -12,5 +12,6 @@ namespace FinanceApp.Services
         Task<Budget> Update(BudgetDTO budget, int? id);
         Task<Budget> Delete(int? id);
         Task<byte[]> ExportExcel();
+        Task<byte[]> ExportPdf();
     }
 }
