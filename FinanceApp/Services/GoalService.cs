@@ -141,7 +141,7 @@ namespace FinanceApp.Services
 
         public async Task<byte[]> ExportExcel()
         {
-            var exportData = await GetNotificationExportData();
+            var exportData = await GetGoalExportData();
 
             using var workbook = new XLWorkbook();
             var worksheet = workbook.Worksheets.Add("Goals");
@@ -160,7 +160,7 @@ namespace FinanceApp.Services
 
         public async Task<byte[]> ExportPdf()
         {
-            var exportData = await GetNotificationExportData();
+            var exportData = await GetGoalExportData();
 
             QuestPDF.Settings.License = LicenseType.Community;
 
@@ -229,7 +229,7 @@ namespace FinanceApp.Services
             return document.GeneratePdf();
         }
 
-        private async Task<List<ExportGoalDataDTO>> GetNotificationExportData()
+        private async Task<List<ExportGoalDataDTO>> GetGoalExportData()
         {
             var query = _context.Goals
                                 .Include(u => u.User)
