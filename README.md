@@ -4,19 +4,19 @@ A fullstack MVC based web application built with .NET 8 and C# to help users tra
 ## ✨ Key Features
 Finze web application is a system that allows users to:
 
-  1. Manage their accounts (registering, verifying account, accessing their profile, updating data and resetting password).
-  2. Setting their Budgets.
-  3. Tracking their financial transactions.
-  4. Registering categories for their expenses.
-  5. Adding bill reminders for recurring payments.
-  6. Setting financial goals.
-  7. Adding recurring bills based on frequency of recurrence.
-  8. Managing their financial accounts, this module represents users personal account, business account, and similar accounts.
-  9. Receiving notifications about their account activity or updates.
-  10. Checking different charts related to their data.
-  11. Exporting their data in two formats: excel and pdf.
-  12. Searching data, adding, updating and deleting.
-  13. Provides a Helping page for users.
+  * Manage their accounts (registering, verifying account, accessing their profile, updating data and resetting password).
+  * Setting their Budgets.
+  * Tracking their financial transactions.
+  * Registering categories for their expenses.
+  * Adding bill reminders for recurring payments.
+  * Setting financial goals.
+  * Adding recurring bills based on frequency of recurrence.
+  * Managing their financial accounts, this module represents users personal account, business account, and similar accounts.
+  * Receiving notifications about their account activity or updates.
+  * Checking different charts related to their data.
+  * Exporting their data in two formats: excel and pdf.
+  * Searching data, adding, updating and deleting.
+  * Provides a Helping page for users.
 
 ## 🛠 Tech Stack
 
